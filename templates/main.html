@@ -5,9 +5,69 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="/static/main.css">
     <title>Калькулятор предметів</title>
 </head>
 <body>
+    <nav></nav>
+    <div id="search">
+        <input name="text"
+         id="search-input" class="form-control me-2" type="search" placeholder="Пошук" aria-label="Search">
+        <select onchange="send_query()" name="field" id="search-select" class="form-select form-select-lg mb-3" aria-label="Large select example">
+            <option value="name" selected>Назва</option>
+            <option value="mod">Мод</option>
+        </select>
+        <div id="items">
+          
+            <table class="table table-dark">
+                <tbody id="search-tbody">
+                </tbody>
+              </table>
 
+        </div>
+    </div>
 </body>
 </html>
+<script>
+document.querySelector('#search-input').addEventListener('input', function(event) {
+  send_query()
+});
+function send_query() {
+  let input = document.getElementById('search-input')
+  let select = document.getElementById('search-select')
+  
+
+  axios.get('/search/?field=' + select.value + '&text=' + input.value)
+    .then(function (response) {
+      let tbody = document.getElementById('search-tbody');
+      data = response.data
+      tbody.innerHTML = '';
+      for (let i = 0; data.length > i; i++){
+        let element = JSON.parse(data[i])
+
+        let node = document.createElement("tr");
+        let name = document.createElement("td");
+        let mod = document.createElement("td");
+
+        name.classList.add('name');
+        mod.classList.add('mod');
+
+        tbody.appendChild(node);
+        node.appendChild(name);
+        node.appendChild(mod);
+
+        name.innerText = element['name'];
+        mod.innerText = element['mod'];
+
+      }
+      
+      
+    })
+    .catch(function (error) {
+      // handle error
+      alert(error);
+    })
+}
+</script>

@@ -1,0 +1,68 @@
+* {
+    padding: 0;
+    margin: 0;
+}
+
+body,
+html {
+    background-color: #1a1d20;
+    width: 100%;
+    height: 100%;
+}
+
+nav {
+    height: 80px;
+    width: 75vw;
+    float: right;
+    border-bottom: 1px solid black;
+}
+
+#search {
+    padding-top: 25px;
+    position: relative;
+    height: 100%;
+    width: 33vw;
+    max-width: 550px;
+    background-color: #212529;
+}
+
+#search input {
+    box-shadow: none;
+    margin-left: 35px;
+    width: 40%;
+}
+
+#search select {
+    display: inline;
+    box-shadow: none;
+    width: 120px;
+    font-size: 1rem;
+}
+
+#search input,
+select {
+    display: inline;
+}
+#items {
+    position: relative;
+    margin-top: 20px;
+    overflow: auto;
+    height: 90%;
+}
+#search table {
+    padding-left: 15px;
+    width: 85%;
+    text-align: center;
+    margin: auto;
+}
+td {
+    position: relative;
+    max-width: 267px;
+    overflow: hidden;
+}
+.name {
+    text-align: center;
+}
+.mod {
+    text-align: right;
+}
