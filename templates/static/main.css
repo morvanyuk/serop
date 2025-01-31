@@ -3,20 +3,41 @@
     margin: 0;
 }
 
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+input {
+    -moz-appearance: textfield;
+}
+
 body,
 html {
     background-color: #1a1d20;
     width: 100%;
-    height: 100%;
+    height: 150%;
 }
 
 nav {
     height: 80px;
-    width: 75vw;
+    width: 100%;
     float: right;
-    border-bottom: 1px solid black;
+    background-color: #212529;
+    width: calc(100vw - 550px);
+    text-align: center;
+    padding-top: 25px;
 }
-
+nav h5 {
+    display: inline;
+    color: wheat;
+    padding-bottom: 3px;
+    margin-left: 30px;
+    cursor: pointer;
+    /* border-bottom: 2px solid aqua; */
+}
+nav input {
+    display: none;
+}
 #search {
     padding-top: 25px;
     position: relative;
@@ -25,7 +46,6 @@ nav {
     max-width: 550px;
     background-color: #212529;
 }
-
 #search input {
     box-shadow: none;
     margin-left: 35px;
@@ -59,10 +79,57 @@ td {
     position: relative;
     max-width: 267px;
     overflow: hidden;
+    cursor: pointer;
 }
 .name {
     text-align: center;
 }
 .mod {
     text-align: right;
+}
+#search-tbody p{
+    display: none;
+}
+#calculator {
+    width: calc(100vw - 550px);
+    height: calc(100vh - 80px);
+    right: 0;
+    top: 80px;
+    position: absolute;
+}
+#calculator table {
+    margin: auto;
+    margin-top: 50px;
+    width: 800px;
+    text-align: center;
+}
+#calculator span {
+    text-align: center;
+    border: none;
+    width: 33px;
+    height: 33px;
+    font-size: 23px;
+    
+}
+#plus {
+    background-color: green;
+    line-height: 20px;
+}
+#minus {
+    background-color: red;
+    line-height: 15px;
+}
+#calculator input {
+    font-size: 18px;
+    text-align: center;
+    width: 40px;
+    border: none;
+    outline: none;
+    background-color: #d1e7dd;
+}
+#total-price {
+    text-align: right;
+    color: wheat;
+    margin-top: 80px;
+    margin-right: 25%;
 }
