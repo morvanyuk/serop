@@ -1,0 +1,204 @@
+* {
+    padding: 0;
+    margin: 0;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+input {
+    -moz-appearance: textfield;
+}
+
+body,
+html {
+    background-color: #1a1d20;
+    width: 100%;
+    height: 150%;
+}
+
+nav {
+    height: 80px;
+    width: 100%;
+    float: right;
+    background-color: #212529;
+    width: calc(100vw - 550px);
+    text-align: center;
+    padding-top: 25px;
+}
+nav h5 {
+    display: inline;
+    color: wheat;
+    padding-bottom: 3px;
+    margin-left: 30px;
+    cursor: pointer;
+    /* border-bottom: 2px solid aqua; */
+}
+nav input {
+    display: none;
+}
+#search {
+    padding-top: 25px;
+    position: relative;
+    height: 100%;
+    width: 33vw;
+    max-width: 550px;
+    background-color: #212529;
+}
+#search input {
+    box-shadow: none;
+    margin-left: 35px;
+    width: 40%;
+}
+
+#search select {
+    display: inline;
+    box-shadow: none;
+    width: 120px;
+    font-size: 1rem;
+}
+
+#search input,
+select {
+    display: inline;
+}
+#items {
+    position: relative;
+    margin-top: 20px;
+    overflow: auto;
+    height: 90%;
+}
+#search table {
+    padding-left: 15px;
+    width: 85%;
+    text-align: center;
+    margin: auto;
+}
+td {
+    position: relative;
+    max-width: 267px;
+    overflow: hidden;
+    cursor: pointer;
+}
+.name {
+    text-align: center;
+}
+.mod {
+    text-align: right;
+}
+#search-tbody p{
+    display: none;
+}
+#calculator {
+    width: calc(100vw - 550px);
+    height: calc(100vh - 80px);
+    right: 0;
+    top: 80px;
+    position: absolute;
+}
+#calculator table {
+    margin: auto;
+    margin-top: 50px;
+    width: 800px;
+    text-align: center;
+}
+#calculator span {
+    text-align: center;
+    border: none;
+    width: 33px;
+    height: 33px;
+    font-size: 23px;
+    
+}
+#plus {
+    background-color: green;
+    line-height: 20px;
+}
+#minus {
+    background-color: red;
+    line-height: 15px;
+}
+#calculator input {
+    font-size: 18px;
+    text-align: center;
+    width: 40px;
+    border: none;
+    outline: none;
+    background-color: #d1e7dd;
+}
+#total-price {
+    text-align: right;
+    color: wheat;
+    margin-top: 80px;
+    margin-right: 25%;
+}
+#craft-button {
+    float: right;
+    margin-right: 46%;
+    margin-top: 25px;
+    padding: 0.8em 4em;
+    border: none;
+    outline: none;
+    color: rgb(255, 255, 255);
+    background: #111;
+    cursor: pointer;
+    position: relative;
+    z-index: 0;
+    border-radius: 10px;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+  }
+  
+  #craft-button:before {
+    content: "";
+    background: linear-gradient(
+      45deg,
+      #ff0000,
+      #ff7300,
+      #fffb00,
+      #48ff00,
+      #00ffd5,
+      #002bff,
+      #7a00ff,
+      #ff00c8,
+      #ff0000
+    );
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    background-size: 500%;
+    z-index: -1;
+    filter: blur(5px);
+    -webkit-filter: blur(5px);
+    width: calc(100% + 8px);
+    height: calc(100% + 8px);
+    animation: glowing-button-85 20s linear infinite;
+    transition: opacity 0.3s ease-in-out;
+    border-radius: 10px;
+  }
+  
+  @keyframes glowing-button-85 {
+    0% {
+      background-position: 0 0;
+    }
+    50% {
+      background-position: 400% 0;
+    }
+    100% {
+      background-position: 0 0;
+    }
+  }
+  
+  #craft-button:after {
+    z-index: -1;
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #222;
+    left: 0;
+    top: 0;
+    border-radius: 10px;
+  }
