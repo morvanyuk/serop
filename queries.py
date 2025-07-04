@@ -25,6 +25,26 @@ class Database:
 
 db = Database()
 
+def create_user(username, password):
+    db = mysql.connector.connect(host=env('DB_HOST'), user=env("DB_USER"),
+                    passwd=env("DB_PASSWORD"),database=env("DB_DATABASE"))
+
+    cursorObject = db.cursor()
+    cursorObject.execute(f"""INSERT INTO users (username, password) VALUES ("{username}", "{password}") """)
+    db.commit()
+    db.close()
+
+
+def get_user(username):
+    db = mysql.connector.connect(host=env('DB_HOST'), user=env("DB_USER"),
+                    passwd=env("DB_PASSWORD"),database=env("DB_DATABASE"))
+
+    cursorObject = db.cursor()
+    cursorObject.execute(f"""SELECT * FROM users WHERE username = '{username}'""")
+    result = cursorObject.fetchall()
+    db.close()
+    return result
+
 def items_search_via_name(text):
     db = mysql.connector.connect(host=env('DB_HOST'), user=env("DB_USER"),
                     passwd=env("DB_PASSWORD"),database=env("DB_DATABASE"))
