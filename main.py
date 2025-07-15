@@ -11,6 +11,7 @@ from queries import (
     add_item,
     get_recipe,
     get_item_price,
+    add_recipe,
 )
 
 app = FastAPI()
@@ -32,7 +33,9 @@ def main():
     return FileResponse(path="templates/main.html", status_code=200)
 
 @app.get('/search/')
-def search(field: str, text: str, server_id: int):
+def search(field: str, text: str, server_id: int = None):
+    if server_id is None:
+        return []
     if field == "name":
         return items_search_via_name(text, server_id)
     elif field == "mod":
@@ -88,3 +91,13 @@ def calculate_item_cost(item_id, quantity, server_id):
             server_id
         )
     return total_cost
+
+@app.post('/recipes/')
+def create_recipe(
+    item_id: int = Body(...),
+    server_id: int = Body(...),
+    ingredients: list = Body(...)
+):
+    for ingredient in ingredients:
+        add_recipe(item_id, ingredient['ingredient_id'], ingredient['quantity'], server_id)
+    return JSONResponse(content={"status": "success"})

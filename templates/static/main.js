@@ -1,4 +1,22 @@
 
+function loadServers() {
+    axios.get('/servers/')
+        .then(function(response) {
+            let serverSelect = document.getElementById('server-select');
+            serverSelect.innerHTML = '';
+            response.data.forEach(function(server) {
+                let option = document.createElement('option');
+                option.value = server.id;
+                option.textContent = server.name;
+                serverSelect.appendChild(option);
+            });
+            send_query(); // Call send_query after servers are loaded
+        })
+        .catch(function(error) {
+            alert('Error loading servers: ' + error);
+        });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     loadServers();
 });
@@ -95,7 +113,7 @@ function add_to_calc(event) {
               <span type="button" onclick="plus(event)" id="plus" class="btn btn-secondary">+</span>
            </div></td>`
   table.insertBefore(node, table.firstChild);
-  add_to_total_price(price)
+  add_to_total_price(parseFloat(price))
 
 }
 function send_query() {
@@ -103,20 +121,24 @@ function send_query() {
   let select = document.getElementById('search-select')
   let serverId = document.getElementById('server-select').value;
   
+  if (!serverId) {
+    return;
+  }
 
   axios.get('/search/?field=' + select.value + '&text=' + input.value + '&server_id=' + serverId)
     .then(function (response) {
+      console.log(response.data);
       let tbody = document.getElementById('search-tbody');
-      data = response.data
+      let data = response.data
       tbody.innerHTML = '';
-      for (let i = 0; data.length > i; i++){
-        let element = JSON.parse(data[i])
+      for (let i = 0; i < data.length; i++){
+        let element = data[i]
 
         let node = document.createElement("tr");
-        node.dataset.itemId = element['id'];
+        node.dataset.itemId = element.id;
 
         node.innerHTML = `<td onclick='add_to_calc(event)' 
-        class="name">${element['name']}</td><td onclick='add_to_calc(event)' class="mode">${element['mod']}</td><p>${element['price']}</p>`;
+        class="name">${element.name}</td><td onclick='add_to_calc(event)' class="mode">${element.is_mods}</td><td class="price" style="display: none;">${element.price}</td>`;
         tbody.appendChild(node);
       }
       
@@ -140,6 +162,10 @@ document.getElementById('calculate-btn').addEventListener('click', function() {
     }
 
     let serverId = document.getElementById('server-select').value;
+    if (!serverId) {
+        alert("Please select a server.");
+        return;
+    }
     let craftType = document.getElementById('simple-calc-checkbox').checked ? 'simple' : 'percentage';
 
     axios.post('/calculate/', {
@@ -156,7 +182,7 @@ document.getElementById('calculate-btn').addEventListener('click', function() {
 });
 function plus(event){
   let price = event.target.parentNode.parentNode.parentNode.querySelector('.price').innerText
-  add_to_total_price(price)
+  add_to_total_price(parseFloat(price))
   event.target.parentNode.querySelector('input').value = parseFloat(event.target.parentNode.querySelector('input').value) + 1
 }
 function minus(event){
@@ -192,8 +218,85 @@ function loadServers() {
                 serverSelect.appendChild(option);
             });
             send_query();
+            loadItemsForRecipe();
         })
         .catch(function(error) {
             alert('Error loading servers: ' + error);
         });
 }
+
+function loadItemsForRecipe() {
+    let serverId = document.getElementById('server-select').value;
+    if (!serverId) return;
+
+    axios.get(`/search/?field=name&text=&server_id=${serverId}`)
+        .then(function(response) {
+            let recipeItemSelect = document.getElementById('recipe-item-select');
+            recipeItemSelect.innerHTML = '';
+            response.data.forEach(function(item) {
+                let option = document.createElement('option');
+                option.value = item.id;
+                option.textContent = item.name;
+                recipeItemSelect.appendChild(option);
+            });
+        })
+        .catch(function(error) {
+            alert('Error loading items for recipe: ' + error);
+        });
+}
+
+document.getElementById('add-ingredient-btn').addEventListener('click', function() {
+    let ingredientsDiv = document.getElementById('recipe-ingredients');
+    let ingredientDiv = document.createElement('div');
+    ingredientDiv.innerHTML = `
+        <select class="ingredient-select"></select>
+        <input type="number" class="ingredient-quantity" placeholder="Quantity">
+    `;
+    ingredientsDiv.appendChild(ingredientDiv);
+    loadItemsForIngredient(ingredientDiv.querySelector('.ingredient-select'));
+});
+
+function loadItemsForIngredient(selectElement) {
+    let serverId = document.getElementById('server-select').value;
+    if (!serverId) return;
+
+    axios.get(`/search/?field=name&text=&server_id=${serverId}`)
+        .then(function(response) {
+            selectElement.innerHTML = '';
+            response.data.forEach(function(item) {
+                let option = document.createElement('option');
+                option.value = item.id;
+                option.textContent = item.name;
+                selectElement.appendChild(option);
+            });
+        })
+        .catch(function(error) {
+            alert('Error loading items for ingredient: ' + error);
+        });
+}
+
+document.getElementById('save-recipe-btn').addEventListener('click', function() {
+    let itemId = document.getElementById('recipe-item-select').value;
+    let serverId = document.getElementById('server-select').value;
+    let ingredients = [];
+    let ingredientDivs = document.getElementById('recipe-ingredients').children;
+
+    for (let i = 0; i < ingredientDivs.length; i++) {
+        let ingredientDiv = ingredientDivs[i];
+        let ingredientId = ingredientDiv.querySelector('.ingredient-select').value;
+        let quantity = ingredientDiv.querySelector('.ingredient-quantity').value;
+        ingredients.push({ ingredient_id: ingredientId, quantity: quantity });
+    }
+
+    axios.post('/recipes/', {
+        item_id: itemId,
+        server_id: serverId,
+        ingredients: ingredients
+    })
+    .then(function(response) {
+        alert('Recipe saved successfully');
+    })
+    .catch(function(error) {
+        alert('Error saving recipe: ' + error);
+    });
+});

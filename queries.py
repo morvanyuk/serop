@@ -49,7 +49,7 @@ db = Database()
 
 def items_search_via_name(text, server_id):
     query = """
-        SELECT JSON_OBJECT("name", name, "mod", is_mods, "price", price)
+        SELECT id, name, is_mods, price
         FROM items
         WHERE name LIKE %s AND server_id = %s
         LIMIT 40
@@ -58,7 +58,7 @@ def items_search_via_name(text, server_id):
 
 def items_search_via_mod(text, server_id):
     query = """
-        SELECT JSON_OBJECT("name", name, "mod", is_mods, "price", price)
+        SELECT id, name, is_mods, price
         FROM items
         WHERE is_mods LIKE %s AND server_id = %s
         LIMIT 40
@@ -89,3 +89,7 @@ def get_item_price(item_id, server_id):
     query = "SELECT price FROM items WHERE id = %s AND server_id = %s"
     result = db.execute_one(query, (item_id, server_id))
     return result['price'] if result else None
+
+def add_recipe(item_id, ingredient_id, quantity, server_id):
+    query = "INSERT INTO recipes (item_id, ingredient_id, quantity, server_id) VALUES (%s, %s, %s, %s)"
+    db.commit(query, (item_id, ingredient_id, quantity, server_id))
