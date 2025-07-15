@@ -13,6 +13,19 @@
     <title>Калькулятор предметів</title>
 </head>
 <body>
+    <div id="server-manager">
+        <h2>Керування серверами</h2>
+        <select id="server-select"></select>
+        <input type="text" id="new-server-name" placeholder="Назва нового сервера">
+        <button id="add-server-btn">Додати сервер</button>
+    </div>
+    <div id="item-manager">
+        <h2>Керування предметами</h2>
+        <input type="text" id="item-name" placeholder="Назва предмету">
+        <input type="text" id="item-mod" placeholder="Мод">
+        <input type="number" id="item-price" placeholder="Ціна">
+        <button id="add-item-btn">Додати предмет</button>
+    </div>
     <nav>
       <h5 id="simple-calc" style="border-bottom: 2px solid aqua;">Звичайне обчислення</h5>
       <input type="checkbox" id="simple-calc-checkbox" checked>
@@ -49,6 +62,7 @@
         </tbody>
       </table>
       <h3 id="total-price">0</h3>
+      <button id="calculate-btn">Розрахувати</button>
     </div>
     
 </body>
