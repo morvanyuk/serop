@@ -9,6 +9,9 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import RedirectResponse
 from starlette.requests import Request
 
+from models import Item, CraftModel
+
+from graph import create_nodes, craft
 
 from utils import verify_password, verify_user, create_token
 
@@ -21,27 +24,30 @@ environ.Env.read_env()
 
 app = FastAPI()
 
+# Auth
+
 class TokenRefreshMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
-        access_token = request.cookies.get("access_token")
-        refresh_token = request.cookies.get("refresh_token")
+        if not request.url == '/': 
+            access_token = request.cookies.get("access_token")
+            refresh_token = request.cookies.get("refresh_token")
 
-        new_access_token = None
+            new_access_token = None
 
-        if access_token:
-            if verify_user(access_token) == 401:
-                user = verify_user(refresh_token)
-                if type(user) == dict:
-                    new_access_token = create_token(data={"username": user['username'], "password" : user['password']},
-                                     expires_delta=timedelta(minutes=float(env('ACCESS_TOKEN_EXPIRE_MINUTES'))))
-                    new_refresh_token = create_token(data={"username": user['username'], "password" : user['password'], "type" : "refresh"}, 
-                                     expires_delta=timedelta(minutes=float(env('REFRESH_TOKEN_EXPIRE_MINUTES'))))
-                    
-        response: Response = await call_next(request)
+            if access_token:
+                if verify_user(access_token) == 401:
+                    user = verify_user(refresh_token)
+                    if type(user) == dict:
+                        new_access_token = create_token(data={"username": user['username'], "password" : user['password']},
+                                        expires_delta=timedelta(minutes=float(env('ACCESS_TOKEN_EXPIRE_MINUTES'))))
+                        new_refresh_token = create_token(data={"username": user['username'], "password" : user['password'], "type" : "refresh"}, 
+                                        expires_delta=timedelta(minutes=float(env('REFRESH_TOKEN_EXPIRE_MINUTES'))))
+                        
+            response: Response = await call_next(request)
 
-        if new_access_token:
-            response.set_cookie("access_token", new_access_token, httponly=True)
-            response.set_cookie("refresh_token", new_refresh_token, httponly=True)
+            if new_access_token:
+                response.set_cookie("access_token", new_access_token, httponly=True)
+                response.set_cookie("refresh_token", new_refresh_token, httponly=True)
 
         return response
 
@@ -121,6 +127,20 @@ def update(item: Update_element, user: dict = Depends(auth_for_apis)):
         return user
     update_item(item)
     return 200
+
+@app.post('/create/', status_code=200)
+def update(item: Item, user: dict = Depends(auth_for_apis)):
+    if isinstance(user, RedirectResponse):
+        return user
+    create_nodes(item.model_dump())
+
+@app.post('/craft/', status_code=200)
+def update(data: CraftModel, user: dict = Depends(auth_for_apis)):
+    if isinstance(user, RedirectResponse):
+        return user
+    craft(data.model_dump())
+
+
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="127.0.0.1", port=5000, log_level="info")
