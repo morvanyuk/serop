@@ -1,0 +1,80 @@
+{% extends "navbar.html" %}
+
+{% block style %}<link rel="stylesheet" href="/static/nodes.css">{% endblock %}
+
+{% block body %}
+<body>
+
+<div class="container mt-5">
+
+  <!-- Кнопка додати -->
+  <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#itemModal" onclick="openCreateModal()">➕ Додати предмет</button>
+	<br>
+  <!-- Пошук -->
+	<input name="text"
+         id="search-input" class="form-control me-2" type="search" placeholder="Пошук" aria-label="Search">
+	<select onchange="send_query()" name="field" id="search-select" class="form-select form-select-lg mb-3" aria-label="Large select example">
+		<option value="name" selected>Назва</option>
+		<option value="mod">Мод</option>
+	</select>
+
+
+
+  <!-- Таблиця -->
+  <table class="table table-bordered table-striped">
+    <thead class="table-dark">
+      <tr>
+        <th>ID</th>
+        <th>Назва</th>
+        <th>Мод</th>
+        <th>Ціна</th>
+        <th>Елементарний</th>
+        <th>Дії</th>
+      </tr>
+    </thead>
+    <tbody id="itemsTableBody">
+      <!-- Динамічний контент -->
+    </tbody>
+  </table>
+</div>
+
+<!-- Модальне вікно -->
+<div class="modal fade" id="itemModal" tabindex="-1" aria-labelledby="itemModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form id="itemForm" class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="itemModalLabel">Додати предмет</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрити"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="itemId">
+        <input type="hidden" id="graph">
+        <div class="mb-3">
+          <label for="itemName" class="form-label">Назва</label>
+          <input type="text" class="form-control" id="itemName" required>
+        </div>
+        <div class="mb-3">
+          <label for="itemName" class="form-label">Мод</label>
+          <input type="text" class="form-control" id="itemMod" required>
+        </div>
+        <div class="mb-3">
+          <label for="itemPrice" class="form-label">Ціна</label>
+          <input type="float" class="form-control" id="itemPrice" required min="0">
+        </div>
+  </label>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Скасувати</button>
+        <button type="submit" class="btn btn-primary">Зберегти</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
+
+
+{% block script %}<script src="/static/nodes.js"></script>{% endblock %}
+
+</body>
+</html>

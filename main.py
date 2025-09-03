@@ -1,21 +1,22 @@
 import uvicorn
-from fastapi import FastAPI, Depends, HTTPException, Response, Request, status
+from fastapi import FastAPI, Body, Depends, HTTPException, Response, Request, status
 from datetime import timedelta
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, RedirectResponse
-from pydantic import BaseModel, PositiveInt
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import RedirectResponse
 from starlette.requests import Request
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
 
-from models import Item, CraftModel
+from schemas import *
 
-from graph import create_nodes, craft
+from graph import *
 
 from utils import verify_password, verify_user, create_token
 
-from queries import get_user, items_search_via_name, items_search_via_mod, update_item
+from queries import get_user, update_item
 
 import environ
 
@@ -23,6 +24,9 @@ env = environ.Env()
 environ.Env.read_env()
 
 app = FastAPI()
+
+
+templates = Jinja2Templates(directory="templates")
 
 # Auth
 
@@ -66,23 +70,25 @@ app.add_middleware(TokenRefreshMiddleware)
 
 app.mount("/static", StaticFiles(directory="templates/static"), name="static")
 
-class Update_element(BaseModel):
-    id_element: PositiveInt
-    price: PositiveInt | float
-
-class UserData(BaseModel):
-    username: str
-    password: str
-
 def auth_for_apis(request: Request, response : Response):
     token = request.cookies.get("refresh_token")
 
     if not token or verify_user(token) == 401:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
     
+def auth_for_page(request):
+    token = request.cookies.get("access_token")
+    token2 = request.cookies.get("refresh_token")
+
+    if not token:
+        return status.HTTP_401_UNAUTHORIZED
+    
+    if verify_user(token2) == 401:
+        return status.HTTP_401_UNAUTHORIZED
+    
 
 @app.post('/login')
-def main(data: UserData, response : Response, status_code=200):
+def login(data: UserData, response : Response, status_code=200):
     user = get_user(data.username)
     if user and verify_password(plain_password=data.password, hashed_password=user[0][1]):
         access_token = create_token(data={"username": data.username, "password" : user[0][1]},
@@ -97,47 +103,77 @@ def main(data: UserData, response : Response, status_code=200):
     raise HTTPException(status_code=401, detail="Invalid credentials")
 
 @app.get('/')
-def main(request: Request, response : Response, status_code=200):
-    token = request.cookies.get("access_token")
-    token2 = request.cookies.get("refresh_token")
+def main(request: Request, status_code=200):
+    if auth_for_page(request) is not None:
+        return FileResponse(path="templates/login.html")
+    
+    return templates.TemplateResponse(
+        request=request, name="menu.html"
+    )
 
-    if not token:
+@app.get('/get-all-graphs')
+def get_all_graphs():
+    return all_graphs()
+
+@app.get('/crud/{name}')
+def get_graph(request: Request):
+    if auth_for_page(request) is not None:
         return FileResponse(path="templates/login.html")
-    
-    if verify_user(token2) == 401:
-        return FileResponse(path="templates/login.html")
-    
-    return FileResponse(path="templates/main.html")
+    return templates.TemplateResponse(
+        request=request, name="nodes.html"
+    )
+
+@app.post('/create-graph/')
+def create_new_graph(graph: GraphModel = Body(), user: dict = Depends(auth_for_apis)):
+    if isinstance(user, RedirectResponse):
+        return user
+    create_graph(graph.name)
+    return status.HTTP_201_CREATED
 
 @app.get('/search/')
-def search(field: str = 'name' or 'mod', text: str = None, user: dict = Depends(auth_for_apis)):
+def search(field: str = 'name' or 'mod', text: str = None, graph_name: str = None , user: dict = Depends(auth_for_apis)):
     if isinstance(user, RedirectResponse):
         return user
-    if field == "name":
-        return items_search_via_name(text)
-    elif field == "mod":
-        return items_search_via_mod(text)
+    return get_all_nodes_from_graph(graph_name=graph_name, field=field, text=text)
     
-    else: 
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Filter field not found")
     
-@app.post('/update/')
-def update(item: Update_element, user: dict = Depends(auth_for_apis)):
+@app.get('/nodes/{name}')
+def get_graph_nodes(name, user: dict = Depends(auth_for_apis)):
     if isinstance(user, RedirectResponse):
         return user
-    update_item(item)
+    return get_all_nodes_from_graph(name)
+    
+@app.post('/nodes/update/')
+def update(node: ItemUpdate, user: dict = Depends(auth_for_apis)):
+    if isinstance(user, RedirectResponse):
+        return user
+    update_node(node.model_dump())
     return 200
 
-@app.post('/create/', status_code=200)
-def update(item: Item, user: dict = Depends(auth_for_apis)):
+@app.post('/nodes/create/')
+def create(item: ItemCreate, user: dict = Depends(auth_for_apis)):
     if isinstance(user, RedirectResponse):
         return user
-    create_nodes(item.model_dump())
+    create_node(item.model_dump())
+    return status.HTTP_201_CREATED
+
+@app.post("/nodes/delete/")
+def delete_item(item: ItemDelete, user: dict = Depends(auth_for_apis)):
+    if isinstance(user, RedirectResponse):
+        return user
+    delete_node(item.model_dump())
+    return status.HTTP_204_NO_CONTENT
+
+@app.get('/craft/{graph}/', status_code=200)
+def craftItem(graph: str, request: Request):
+    if auth_for_page(request) is not None:
+        return FileResponse(path="templates/login.html")
+    return templates.TemplateResponse(
+        request=request, name="main.html"
+    )
 
 @app.post('/craft/', status_code=200)
-def update(data: CraftModel, user: dict = Depends(auth_for_apis)):
-    if isinstance(user, RedirectResponse):
-        return user
+def craftItem(data: CraftModel):
     craft(data.model_dump())
 
 

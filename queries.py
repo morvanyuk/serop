@@ -45,26 +45,6 @@ def get_user(username):
     db.close()
     return result
 
-def items_search_via_name(text):
-    db = mysql.connector.connect(host=env('DB_HOST'), user=env("DB_USER"),
-                    passwd=env("DB_PASSWORD"),database=env("DB_DATABASE"))
-
-    cursorObject = db.cursor()
-    cursorObject.execute(f"""SELECT JSON_OBJECT("id", id, "name", name, "mod", is_mods, "price", price) FROM items WHERE name LIKE '%{text}%' LIMIT 40""")
-    result = cursorObject.fetchall()
-    db.close()
-    return result
-
-def items_search_via_mod(text):
-    db = mysql.connector.connect(host=env('DB_HOST'), user=env("DB_USER"),
-                    passwd=env("DB_PASSWORD"),database=env("DB_DATABASE"))
-
-    cursorObject = db.cursor()
-    cursorObject.execute(f"""SELECT JSON_OBJECT("id", id, "mod", is_mods, "price", price) FROM items WHERE is_mods LIKE '%{text}%' LIMIT 40""")
-    result = cursorObject.fetchall()
-    db.close()
-    return result
-
 
 def update_item(item):
     db = mysql.connector.connect(host=env('DB_HOST'), user=env("DB_USER"),

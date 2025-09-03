@@ -1,0 +1,16 @@
+
+table {
+    max-width: 500px;
+    margin: auto;
+    margin-top: 40px;
+    text-align: center;
+}
+a {
+    color: aqua;
+}
+#button-container {
+    width: 500px;
+    
+    margin: auto;
+    margin-top: 45px;
+}

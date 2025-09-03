@@ -15,6 +15,7 @@ passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 pyjwt = "^2.10.1"
 neo4j = "^5.28.1"
 python-arango = "^8.2.1"
+jinja2 = "^3.1.6"
 
 
 [build-system]
